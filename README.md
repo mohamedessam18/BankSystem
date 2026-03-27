@@ -78,29 +78,29 @@ flowchart LR
 
 ```text
 .
-├── backend/
-│   ├── controllers/
-│   ├── core/
-│   ├── data/
-│   ├── routes/
-│   ├── services/
-│   ├── vendor/
-│   ├── CMakeLists.txt
-│   └── main.cpp
-├── frontend/
-│   ├── public/
-│   ├── src/
-│   │   ├── components/
-│   │   ├── context/
-│   │   ├── hooks/
-│   │   ├── layouts/
-│   │   ├── pages/
-│   │   ├── services/
-│   │   └── styles/
-│   ├── package.json
-│   └── vite.config.js
-├── Bank System.sln
-└── README_WEBAPP.md
+|-- backend/
+|   |-- controllers/
+|   |-- core/
+|   |-- data/
+|   |-- routes/
+|   |-- services/
+|   |-- vendor/
+|   |-- CMakeLists.txt
+|   `-- main.cpp
+|-- frontend/
+|   |-- public/
+|   |-- src/
+|   |   |-- components/
+|   |   |-- context/
+|   |   |-- hooks/
+|   |   |-- layouts/
+|   |   |-- pages/
+|   |   |-- services/
+|   |   `-- styles/
+|   |-- package.json
+|   `-- vite.config.js
+|-- Bank System.sln
+`-- README_WEBAPP.md
 ```
 
 ## Feature Highlights

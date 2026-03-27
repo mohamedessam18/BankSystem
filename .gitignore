@@ -1,0 +1,22 @@
+.vs/
+*.user
+*.obj
+*.ilk
+*.pdb
+*.ipch
+*.recipe
+*.log
+*.idb
+*.tlog
+*.db
+*.db-shm
+*.db-wal
+*.opendb
+*.suo
+
+backend/build/
+frontend/node_modules/
+frontend/dist/
+
+Bank System/x64/
+x64/

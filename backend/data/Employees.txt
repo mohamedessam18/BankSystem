@@ -1,0 +1,17 @@
+20000,mohamed ahmed,mohamedah8,1.5e+06
+20001,Sama Osama,sama1234,1e+10
+20002,Nora Adam,noraadam1,7000
+20003,Lina Karim,linakarim1,7500
+20004,Alaa Emad,alaaemad1,7000
+20005,Ahmed Samy,ahmedsamy1,6500
+20006,Sara Adel,saraadel22,7200
+20007,Omar Fathy,omarfathy3,8000
+20008,Nour Hassan,nourhassan4,9000
+20009,Youssef Ali,youssefali5,7500
+20010,Mariam Khaled,mariamkhaled6,6800
+20011,Hassan Tarek,hassantarek7,8200
+20012,Laila Mostafa,lailamostafa8,7700
+20013,Karim Nader,karimnader9,9500
+20014,Salma Essam,salmaessam10,8800
+20015,Essam Abozeed,essam1234,5e+07
+20016,Emad,emad12345,5.00025e+08
