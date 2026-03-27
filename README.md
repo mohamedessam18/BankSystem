@@ -127,6 +127,54 @@ flowchart LR
 - Access administrative dashboard tools
 - Update employee records
 
+## Screenshots
+
+### Authentication
+
+<p align="center">
+  <img src="./assets/login.png" alt="Login page" width="45%" />
+  <img src="./assets/signup.png" alt="Signup page" width="45%" />
+</p>
+
+<p align="center">
+  <img src="./assets/signup2.png" alt="Signup flow" width="45%" />
+</p>
+
+### Client Dashboard
+
+<p align="center">
+  <img src="./assets/client%20view.png" alt="Client dashboard" width="45%" />
+  <img src="./assets/client%20view2.png" alt="Client transactions view" width="45%" />
+</p>
+
+### Employee Dashboard
+
+<p align="center">
+  <img src="./assets/employee%20view.png" alt="Employee dashboard" width="45%" />
+  <img src="./assets/employee%20search%20feature.png" alt="Employee search feature" width="45%" />
+</p>
+
+<p align="center">
+  <img src="./assets/empoyee%20add%20client%20feature.png" alt="Employee add client feature" width="45%" />
+</p>
+
+### Admin Dashboard
+
+<p align="center">
+  <img src="./assets/admin%20view.png" alt="Admin dashboard" width="45%" />
+  <img src="./assets/admin%20search%20feature.png" alt="Admin search feature" width="45%" />
+</p>
+
+<p align="center">
+  <img src="./assets/admin%20add%20client%20feature.png" alt="Admin add client feature" width="45%" />
+  <img src="./assets/admin%20edit%20client%20feature.png" alt="Admin edit client feature" width="45%" />
+</p>
+
+<p align="center">
+  <img src="./assets/admin%20add%20employee%20feature.png" alt="Admin add employee feature" width="45%" />
+  <img src="./assets/admin%20edit%20employee%20feature.png" alt="Admin edit employee feature" width="45%" />
+</p>
+
 ## Quick Start
 
 ### 1. Run the backend
