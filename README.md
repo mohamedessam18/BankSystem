@@ -32,6 +32,26 @@ It covers:
 - TXT-file persistence for lightweight local storage
 - A modern fintech-style interface built for the browser
 
+## Team Credits
+
+This project was delivered as the **Final Project** for the **Programming Fundamentals Diploma Using C++** at **Route**.
+
+It was built collaboratively by a team of 6 members, with the project tasks distributed across the team throughout planning, implementation, and delivery.
+
+### Core Team
+
+- **Mohamed Essam** — Team Leader
+- **Mohamed Khalaf**
+- **Mahmoud Salah**
+- **Kareem Mohamed**
+- **Hassan Tarek**
+- **Hager**
+
+### Academic Support
+
+- **Instructor:** Basma Ali
+- **Mentor:** Sama Osama
+
 ## Why This Project Stands Out
 
 | Area | What makes it interesting |
