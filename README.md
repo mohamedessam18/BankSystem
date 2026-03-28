@@ -213,6 +213,8 @@ Backend default URL:
 http://localhost:8080
 ```
 
+The backend also supports a hosted `PORT` environment variable, so it can run on cloud platforms that assign the port automatically.
+
 ### 2. Run the frontend
 
 ```powershell
@@ -233,6 +235,91 @@ http://localhost:5173
 cd frontend
 npm run build
 ```
+
+## Deploy Frontend to GitHub Pages
+
+The frontend is configured to deploy automatically from GitHub Actions to GitHub Pages.
+
+### What is already set up
+
+- GitHub Pages-safe routing via `HashRouter` in production
+- Relative Vite asset paths for repository-based hosting
+- A workflow at `.github/workflows/deploy-frontend.yml` that builds `frontend/` and publishes `frontend/dist`
+
+### GitHub setup steps
+
+1. Push this repository to GitHub.
+2. In GitHub, open **Settings -> Pages**.
+3. Under **Source**, select **GitHub Actions**.
+4. In **Settings -> Secrets and variables -> Actions -> Variables**, add:
+
+```text
+VITE_API_BASE_URL=https://your-backend-url
+```
+
+If you do not set `VITE_API_BASE_URL`, the production build will fall back to:
+
+```text
+http://localhost:8080
+```
+
+That fallback is useful for local development, but it will not work for a live GitHub Pages site unless your backend is also publicly hosted.
+
+### After deployment
+
+Your frontend will be available at:
+
+```text
+https://<your-github-username>.github.io/<your-repository-name>/
+```
+
+## Deploy Backend
+
+GitHub Pages only hosts the frontend, so the C++ API must be deployed separately.
+
+### Recommended path
+
+Deploy the `backend/` folder as a Docker service on a host like Render or Railway.
+
+### Files already added for deployment
+
+- `backend/Dockerfile`
+- `backend/.dockerignore`
+- support for the host-provided `PORT` environment variable in `backend/main.cpp`
+
+### Render example
+
+1. Push the repository to GitHub.
+2. In Render, create a new **Web Service** from the repository.
+3. Set the **Root Directory** to:
+
+```text
+backend
+```
+
+4. Choose **Docker** as the environment.
+5. Deploy the service.
+6. After deployment, copy the public backend URL. It will look similar to:
+
+```text
+https://bank-system-api.onrender.com
+```
+
+7. In GitHub repository settings, set:
+
+```text
+VITE_API_BASE_URL=https://bank-system-api.onrender.com
+```
+
+### Test the deployed backend
+
+Open:
+
+```text
+https://your-backend-url/health
+```
+
+If deployment is working, it should return a JSON success response.
 
 ## API Summary
 

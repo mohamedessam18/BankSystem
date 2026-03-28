@@ -1,6 +1,7 @@
 #include <filesystem>
 #include <functional>
 #include <iostream>
+#include <cstdlib>
 #include <stdexcept>
 #include <string>
 
@@ -22,6 +23,19 @@
 using json = nlohmann::json;
 
 namespace {
+    int resolvePort() {
+        const char* portValue = std::getenv("PORT");
+        if (!portValue || std::string(portValue).empty()) {
+            return 8080;
+        }
+
+        try {
+            return std::stoi(portValue);
+        } catch (...) {
+            return 8080;
+        }
+    }
+
     json parseBody(const httplib::Request& req) {
         if (req.body.empty()) {
             return json::object();
@@ -108,6 +122,7 @@ namespace {
 
 int main() {
     const auto dataDirectory = resolveDataDirectory();
+    const int port = resolvePort();
     BankService bankService(dataDirectory.string());
     httplib::Server server;
 
@@ -116,8 +131,8 @@ int main() {
         res.status = 204;
     });
 
-    server.Get("/health", [](const httplib::Request&, httplib::Response& res) {
-        sendJson(res, 200, successResponse("Bank server is running.", {{"port", 8080}}));
+    server.Get("/health", [port](const httplib::Request&, httplib::Response& res) {
+        sendJson(res, 200, successResponse("Bank server is running.", {{"port", port}}));
     });
 
     server.Post("/login", [&](const httplib::Request& req, httplib::Response& res) {
@@ -240,8 +255,8 @@ int main() {
         }, "Employee updated successfully.");
     });
 
-    std::cout << "Bank HTTP server running at http://localhost:8080\n";
+    std::cout << "Bank HTTP server running at http://localhost:" << port << "\n";
     server.new_task_queue = [] { return new httplib::ThreadPool(8); };
-    server.listen("0.0.0.0", 8080);
+    server.listen("0.0.0.0", port);
     return 0;
 }
