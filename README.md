@@ -26,9 +26,9 @@ This repository started as a C++ banking system and now includes a polished web 
 It covers:
 
 - Secure login and signup flows
-- Role-based dashboards for `client`, `employee`, and `admin`
+- Role-based dashboards for `client`, `employee`, `admin`, and `manager`
 - Banking actions like deposit, withdraw, transfer, and balance lookup
-- Employee and admin management tools
+- Employee, admin, and oversight management tools
 - TXT-file persistence for lightweight local storage
 - A modern fintech-style interface built for the browser
 
@@ -98,6 +98,7 @@ flowchart LR
 
 ```text
 .
+|-- assets/
 |-- backend/
 |   |-- controllers/
 |   |-- core/
@@ -120,10 +121,16 @@ flowchart LR
 |   |-- package.json
 |   `-- vite.config.js
 |-- Bank System.sln
-`-- README_WEBAPP.md
+`-- README.md
 ```
 
 ## Feature Highlights
+
+### Authentication
+
+- Responsive login page for existing users
+- Signup flow for creating new client accounts
+- Protected role-based routing after sign-in
 
 ### Client
 
@@ -132,9 +139,11 @@ flowchart LR
 - Deposit funds
 - Withdraw funds
 - Transfer funds to another client
+- Use a dedicated transactions workspace for daily account actions
 
 ### Employee
 
+- Employee dashboard for client operations
 - Add new clients
 - View client records
 - Search client data
@@ -142,12 +151,22 @@ flowchart LR
 
 ### Admin
 
+- Administrative dashboard with search and summary views
 - Manage employees
 - Manage clients
-- Access administrative dashboard tools
 - Update employee records
+- Access a dedicated security and governance view
+
+### Manager
+
+- View high-level bank overview metrics
+- Control people records across clients, employees, and admins
+- Add and update admin accounts
+- Use executive tools for deposit, withdraw, and transfer intervention workflows
 
 ## Screenshots
+
+All current screenshots are stored in `assets/` and named by feature for easier maintenance.
 
 ### Authentication
 
@@ -348,6 +367,13 @@ If deployment is working, it should return a JSON success response.
 - `GET /admin/employees`
 - `PUT /admin/employee/{id}`
 
+### Manager
+
+- `GET /manager/overview`
+- `GET /manager/admins`
+- `POST /manager/add-admin`
+- `PUT /manager/admin/{id}`
+
 ### Response Shape
 
 ```json
@@ -387,14 +413,14 @@ This is useful if you want to explore or run the original C++ project directly o
 - Backend build depends on a local C++ toolchain and CMake
 - The backend stores data in TXT files rather than a database server
 
-## Recommended README Add-ons
+## Recommended Next Improvements
 
-If you want this GitHub page to look even stronger, the next upgrades are:
+If you want to keep strengthening this project page, useful next upgrades are:
 
-1. Add screenshots or a short demo GIF of the frontend dashboard.
+1. Add screenshots for the manager dashboard and executive tools.
 2. Add deployment links for the frontend and backend.
 3. Add a license section.
-4. Add contributors and roadmap sections.
+4. Add contributors or a roadmap section.
 
 ## Author Notes
 
