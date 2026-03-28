@@ -1,5 +1,9 @@
 #include "BankService.h"
 
+#include <chrono>
+#include <ctime>
+#include <iomanip>
+#include <sstream>
 #include <stdexcept>
 #include <vector>
 
@@ -17,6 +21,10 @@ namespace {
     constexpr int CLIENT_ID_START = 10000;
     constexpr int EMPLOYEE_ID_START = 20000;
     constexpr int ADMIN_ID_START = 30000;
+    constexpr int MANAGER_ID = 90000;
+    constexpr double MANAGER_SALARY = 25000.0;
+    constexpr const char* MANAGER_NAME = "Central Manager";
+    constexpr const char* MANAGER_PASSWORD = "Manager@2026";
 
     Client* findClientById(int id) {
         for (auto& client : Repository::clients) {
@@ -34,6 +42,30 @@ namespace {
             }
         }
         return nullptr;
+    }
+
+    Admin* findAdminById(int id) {
+        for (auto& admin : Repository::admins) {
+            if (admin.getId() == id) {
+                return &admin;
+            }
+        }
+        return nullptr;
+    }
+
+    std::string currentTimestamp() {
+        const auto now = std::chrono::system_clock::now();
+        const std::time_t currentTime = std::chrono::system_clock::to_time_t(now);
+        std::tm localTime{};
+#ifdef _WIN32
+        localtime_s(&localTime, &currentTime);
+#else
+        localtime_r(&currentTime, &localTime);
+#endif
+
+        std::ostringstream stream;
+        stream << std::put_time(&localTime, "%Y-%m-%d %H:%M:%S");
+        return stream.str();
     }
 }
 
@@ -117,13 +149,50 @@ void BankService::persistAdmins() const {
     }
 }
 
+void BankService::addNotification(const std::string& targetRole, const std::string& title, const std::string& detail, int targetUserId) {
+    json notification = {
+        {"id", nextNotificationId_++},
+        {"targetRole", targetRole},
+        {"targetUserId", targetUserId},
+        {"title", title},
+        {"detail", detail},
+        {"createdAt", currentTimestamp()},
+        {"read", false}
+    };
+
+    notifications_.insert(notifications_.begin(), notification);
+
+    if (notifications_.size() > 200) {
+        notifications_.pop_back();
+    }
+}
+
+void BankService::addNotificationsForRoles(const std::vector<std::string>& roles, const std::string& title, const std::string& detail) {
+    for (const auto& role : roles) {
+        addNotification(role, title, detail);
+    }
+}
+
 json BankService::login(int id, const std::string& password) {
     std::lock_guard<std::mutex> lock(mutex_);
     FilesHelper::setDataDirectory(dataDirectory_);
 
+    if (id == MANAGER_ID && password == MANAGER_PASSWORD) {
+        addNotification("manager", "Manager login", std::string(MANAGER_NAME) + " signed in with internal credentials.");
+        return {
+            {"role", "manager"},
+            {"user", makeEmployeeJson(MANAGER_ID, MANAGER_NAME, MANAGER_SALARY)}
+        };
+    }
+
     FilesHelper::getAdmins();
     for (const auto& admin : Repository::admins) {
         if (admin.getId() == id && admin.getPassword() == password) {
+            addNotificationsForRoles(
+                {"manager"},
+                "Admin login",
+                admin.getName() + " (ID " + std::to_string(admin.getId()) + ") signed in."
+            );
             return {
                 {"role", "admin"},
                 {"user", makeEmployeeJson(admin.getId(), admin.getName(), admin.getSalary())}
@@ -134,6 +203,11 @@ json BankService::login(int id, const std::string& password) {
     FilesHelper::getEmployees();
     for (const auto& employee : Repository::employees) {
         if (employee.getId() == id && employee.getPassword() == password) {
+            addNotificationsForRoles(
+                {"admin", "manager"},
+                "Employee login",
+                employee.getName() + " (ID " + std::to_string(employee.getId()) + ") signed in."
+            );
             return {
                 {"role", "employee"},
                 {"user", makeEmployeeJson(employee.getId(), employee.getName(), employee.getSalary())}
@@ -144,6 +218,17 @@ json BankService::login(int id, const std::string& password) {
     FilesHelper::getClients();
     for (const auto& client : Repository::clients) {
         if (client.getId() == id && client.getPassword() == password) {
+            addNotificationsForRoles(
+                {"employee", "admin", "manager"},
+                "Client login",
+                client.getName() + " (ID " + std::to_string(client.getId()) + ") signed in."
+            );
+            addNotification(
+                "client",
+                "Welcome back",
+                client.getName() + ", your client account was accessed successfully.",
+                client.getId()
+            );
             return {
                 {"role", "client"},
                 {"user", makeClientJson(client.getId(), client.getName(), client.getBalance())}
@@ -158,46 +243,8 @@ json BankService::signup(const std::string& role, const std::string& name, const
     if (role == "client") {
         return signupClient(name, password, amount);
     }
-    if (role == "employee") {
-        std::lock_guard<std::mutex> lock(mutex_);
-        FilesHelper::setDataDirectory(dataDirectory_);
-        validateName(name);
-        validatePassword(password);
-        validateMinimumSalary(amount);
 
-        const int id = FilesHelper::getNextId("LastEmployeeId.txt", EMPLOYEE_ID_START);
-        Employee employee(id, name, password, amount);
-
-        FileManager fileManager;
-        fileManager.addEmployee(employee);
-        Repository::addEmployee(employee);
-
-        return {
-            {"role", "employee"},
-            {"user", makeEmployeeJson(employee.getId(), employee.getName(), employee.getSalary())}
-        };
-    }
-    if (role == "admin") {
-        std::lock_guard<std::mutex> lock(mutex_);
-        FilesHelper::setDataDirectory(dataDirectory_);
-        validateName(name);
-        validatePassword(password);
-        validateMinimumSalary(amount);
-
-        const int id = FilesHelper::getNextId("LastAdminId.txt", ADMIN_ID_START);
-        Admin admin(id, name, password, amount);
-
-        FileManager fileManager;
-        fileManager.addAdmin(admin);
-        Repository::addAdmin(admin);
-
-        return {
-            {"role", "admin"},
-            {"user", makeEmployeeJson(admin.getId(), admin.getName(), admin.getSalary())}
-        };
-    }
-
-    throw std::runtime_error("Role must be client, employee, or admin.");
+    throw std::runtime_error("Only client accounts can be created from signup.");
 }
 
 json BankService::signupClient(const std::string& name, const std::string& password, double initialBalance) {
@@ -214,6 +261,17 @@ json BankService::signupClient(const std::string& name, const std::string& passw
     FileManager fileManager;
     fileManager.addClient(client);
     Repository::addClient(client);
+    addNotificationsForRoles(
+        {"employee", "admin", "manager"},
+        "New client account",
+        client.getName() + " (ID " + std::to_string(client.getId()) + ") was created."
+    );
+    addNotification(
+        "client",
+        "Account created",
+        "Your client account is ready with ID " + std::to_string(client.getId()) + ".",
+        client.getId()
+    );
 
     return {
         {"role", "client"},
@@ -256,6 +314,13 @@ json BankService::deposit(int id, double amount) {
 
     client->deposit(amount);
     persistClients();
+    const auto amountLabel = "$" + std::to_string(static_cast<int>(amount));
+    addNotificationsForRoles(
+        {"employee", "admin", "manager"},
+        "Client deposit",
+        client->getName() + " (ID " + std::to_string(client->getId()) + ") deposited " + amountLabel + "."
+    );
+    addNotification("client", "Deposit completed", "Your account received a deposit of " + amountLabel + ".", client->getId());
 
     return {
         {"client", makeClientJson(client->getId(), client->getName(), client->getBalance())},
@@ -282,6 +347,13 @@ json BankService::withdraw(int id, double amount) {
 
     client->withdraw(amount);
     persistClients();
+    const auto amountLabel = "$" + std::to_string(static_cast<int>(amount));
+    addNotificationsForRoles(
+        {"employee", "admin", "manager"},
+        "Client withdrawal",
+        client->getName() + " (ID " + std::to_string(client->getId()) + ") withdrew " + amountLabel + "."
+    );
+    addNotification("client", "Withdrawal completed", "A withdrawal of " + amountLabel + " was made from your account.", client->getId());
 
     return {
         {"client", makeClientJson(client->getId(), client->getName(), client->getBalance())},
@@ -316,6 +388,15 @@ json BankService::transfer(int fromClientId, int toClientId, double amount) {
 
     sender->transferTo(amount, *recipient);
     persistClients();
+    const auto amountLabel = "$" + std::to_string(static_cast<int>(amount));
+    addNotificationsForRoles(
+        {"employee", "admin", "manager"},
+        "Client transfer",
+        sender->getName() + " (ID " + std::to_string(sender->getId()) + ") transferred " + amountLabel +
+        " to " + recipient->getName() + " (ID " + std::to_string(recipient->getId()) + ")."
+    );
+    addNotification("client", "Transfer sent", "You sent " + amountLabel + " to client ID " + std::to_string(recipient->getId()) + ".", sender->getId());
+    addNotification("client", "Transfer received", "You received " + amountLabel + " from client ID " + std::to_string(sender->getId()) + ".", recipient->getId());
 
     return {
         {"sender", makeClientJson(sender->getId(), sender->getName(), sender->getBalance())},
@@ -341,6 +422,11 @@ json BankService::addClient(const std::string& name, const std::string& password
     FileManager fileManager;
     fileManager.addClient(client);
     Repository::addClient(client);
+    addNotificationsForRoles(
+        {"employee", "admin", "manager"},
+        "New client account",
+        client.getName() + " (ID " + std::to_string(client.getId()) + ") was created by staff."
+    );
 
     return {
         {"client", makeClientJson(client.getId(), client.getName(), client.getBalance())}
@@ -395,6 +481,11 @@ json BankService::updateClient(int id, const std::string& name, const std::strin
     client->setPassword(password);
     client->setBalance(balance);
     persistClients();
+    addNotificationsForRoles(
+        {"employee", "admin", "manager"},
+        "Client profile updated",
+        "Client " + client->getName() + " (ID " + std::to_string(client->getId()) + ") was updated."
+    );
 
     return {
         {"client", makeClientJson(client->getId(), client->getName(), client->getBalance())}
@@ -414,6 +505,11 @@ json BankService::addEmployee(const std::string& name, const std::string& passwo
     FileManager fileManager;
     fileManager.addEmployee(employee);
     Repository::addEmployee(employee);
+    addNotificationsForRoles(
+        {"admin", "manager"},
+        "New employee account",
+        employee.getName() + " (ID " + std::to_string(employee.getId()) + ") joined the staff."
+    );
 
     return {
         {"employee", makeEmployeeJson(employee.getId(), employee.getName(), employee.getSalary())}
@@ -433,6 +529,11 @@ json BankService::addAdmin(const std::string& name, const std::string& password,
     FileManager fileManager;
     fileManager.addAdmin(admin);
     Repository::addAdmin(admin);
+    addNotificationsForRoles(
+        {"manager"},
+        "New admin account",
+        admin.getName() + " (ID " + std::to_string(admin.getId()) + ") was created."
+    );
 
     return {
         {"admin", makeEmployeeJson(admin.getId(), admin.getName(), admin.getSalary())}
@@ -455,6 +556,50 @@ json BankService::getEmployees() {
     };
 }
 
+json BankService::getAdmins() {
+    std::lock_guard<std::mutex> lock(mutex_);
+    FilesHelper::setDataDirectory(dataDirectory_);
+    FilesHelper::getAdmins();
+
+    json admins = json::array();
+    for (const auto& admin : Repository::admins) {
+        admins.push_back(makeEmployeeJson(admin.getId(), admin.getName(), admin.getSalary()));
+    }
+
+    return {
+        {"admins", admins},
+        {"count", admins.size()}
+    };
+}
+
+json BankService::updateAdmin(int id, const std::string& name, const std::string& password, double salary) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    FilesHelper::setDataDirectory(dataDirectory_);
+    validateName(name);
+    validatePassword(password);
+    validateMinimumSalary(salary);
+    FilesHelper::getAdmins();
+
+    Admin* admin = findAdminById(id);
+    if (admin == nullptr) {
+        throw std::runtime_error("Admin not found.");
+    }
+
+    admin->setName(name);
+    admin->setPassword(password);
+    admin->setSalary(salary);
+    persistAdmins();
+    addNotificationsForRoles(
+        {"manager"},
+        "Admin profile updated",
+        "Admin " + admin->getName() + " (ID " + std::to_string(admin->getId()) + ") was updated."
+    );
+
+    return {
+        {"admin", makeEmployeeJson(admin->getId(), admin->getName(), admin->getSalary())}
+    };
+}
+
 json BankService::updateEmployee(int id, const std::string& name, const std::string& password, double salary) {
     std::lock_guard<std::mutex> lock(mutex_);
     FilesHelper::setDataDirectory(dataDirectory_);
@@ -472,8 +617,118 @@ json BankService::updateEmployee(int id, const std::string& name, const std::str
     employee->setPassword(password);
     employee->setSalary(salary);
     persistEmployees();
+    addNotificationsForRoles(
+        {"admin", "manager"},
+        "Employee profile updated",
+        "Employee " + employee->getName() + " (ID " + std::to_string(employee->getId()) + ") was updated."
+    );
 
     return {
         {"employee", makeEmployeeJson(employee->getId(), employee->getName(), employee->getSalary())}
+    };
+}
+
+json BankService::getSystemOverview() {
+    std::lock_guard<std::mutex> lock(mutex_);
+    FilesHelper::setDataDirectory(dataDirectory_);
+    FilesHelper::getClients();
+    FilesHelper::getEmployees();
+    FilesHelper::getAdmins();
+
+    double totalClientBalances = 0.0;
+    double totalEmployeeSalaries = 0.0;
+    double totalAdminSalaries = 0.0;
+    double highestClientBalance = 0.0;
+    double highestPayroll = 0.0;
+    std::string highestClientName = "N/A";
+    std::string highestPayrollName = "N/A";
+
+    for (const auto& client : Repository::clients) {
+        totalClientBalances += client.getBalance();
+        if (client.getBalance() > highestClientBalance) {
+            highestClientBalance = client.getBalance();
+            highestClientName = client.getName();
+        }
+    }
+
+    for (const auto& employee : Repository::employees) {
+        totalEmployeeSalaries += employee.getSalary();
+        if (employee.getSalary() > highestPayroll) {
+            highestPayroll = employee.getSalary();
+            highestPayrollName = employee.getName();
+        }
+    }
+
+    for (const auto& admin : Repository::admins) {
+        totalAdminSalaries += admin.getSalary();
+        if (admin.getSalary() > highestPayroll) {
+            highestPayroll = admin.getSalary();
+            highestPayrollName = admin.getName();
+        }
+    }
+
+    return {
+        {"metrics", {
+            {"clientsCount", Repository::clients.size()},
+            {"employeesCount", Repository::employees.size()},
+            {"adminsCount", Repository::admins.size()},
+            {"totalClientBalances", totalClientBalances},
+            {"totalPayroll", totalEmployeeSalaries + totalAdminSalaries + MANAGER_SALARY},
+            {"portfolioReserve", totalClientBalances - (Repository::clients.size() * 1500.0)},
+            {"managerId", MANAGER_ID}
+        }},
+        {"insights", {
+            {"topClient", {
+                {"name", highestClientName},
+                {"balance", highestClientBalance}
+            }},
+            {"topPayroll", {
+                {"name", highestPayrollName},
+                {"salary", highestPayroll}
+            }}
+        }}
+    };
+}
+
+json BankService::getNotifications(const std::string& role, int userId) {
+    std::lock_guard<std::mutex> lock(mutex_);
+
+    json items = json::array();
+    int unreadCount = 0;
+
+    for (const auto& notification : notifications_) {
+        const bool roleMatches = notification.at("targetRole").get<std::string>() == role;
+        const int targetUserId = notification.value("targetUserId", 0);
+        const bool userMatches = targetUserId == 0 || targetUserId == userId;
+        if (roleMatches && userMatches) {
+            items.push_back(notification);
+            if (!notification.at("read").get<bool>()) {
+                unreadCount++;
+            }
+        }
+    }
+
+    return {
+        {"notifications", items},
+        {"unreadCount", unreadCount}
+    };
+}
+
+json BankService::markNotificationsRead(const std::string& role, int userId) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    int updated = 0;
+
+    for (auto& notification : notifications_) {
+        const bool roleMatches = notification.at("targetRole").get<std::string>() == role;
+        const int targetUserId = notification.value("targetUserId", 0);
+        const bool userMatches = targetUserId == 0 || targetUserId == userId;
+        if (roleMatches && userMatches && !notification.at("read").get<bool>()) {
+            notification["read"] = true;
+            updated++;
+        }
+    }
+
+    return {
+        {"updated", updated}
     };
 }

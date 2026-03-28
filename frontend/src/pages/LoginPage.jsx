@@ -28,7 +28,7 @@ export default function LoginPage() {
       <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} className="mx-auto max-w-md rounded-[2rem] border border-white/10 bg-white/[0.06] p-8 shadow-panel backdrop-blur-2xl">
         <p className="text-sm uppercase tracking-[0.4em] text-aqua">Secure entry</p>
         <h1 className="mt-4 font-display text-4xl">Login</h1>
-        <p className="mt-3 text-sm leading-7 text-slate-300">Use your bank ID and password to access your workspace.</p>
+        <p className="mt-3 text-sm leading-7 text-slate-300">Use your bank ID and password to access your workspace. Manager access is available from the same login form with the assigned internal credentials.</p>
         <form className="mt-8 space-y-5" onSubmit={submit}>
           <FormField label="ID" type="number" min="1" required value={form.id} onChange={(event) => setForm((current) => ({ ...current, id: event.target.value }))} placeholder="Enter your user ID" />
           <FormField label="Password" type="password" required value={form.password} onChange={(event) => setForm((current) => ({ ...current, password: event.target.value }))} placeholder="Enter your password" />
@@ -37,7 +37,7 @@ export default function LoginPage() {
           </button>
         </form>
         <p className="mt-6 text-sm text-slate-400">
-          Need a client account?{" "}
+          Need a client or employee account?{" "}
           <Link className="text-aqua" to="/signup">
             Sign up here
           </Link>

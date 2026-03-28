@@ -37,4 +37,17 @@ export const adminApi = {
   updateEmployee: (id, payload) => api.put(`/admin/employee/${id}`, payload)
 };
 
+export const managerApi = {
+  getOverview: () => api.get("/manager/overview"),
+  getAdmins: () => api.get("/manager/admins"),
+  addAdmin: (payload) => api.post("/manager/add-admin", payload),
+  updateAdmin: (id, payload) => api.put(`/manager/admin/${id}`, payload)
+};
+
+export const notificationApi = {
+  getNotifications: (role, userId) =>
+    api.get(`/notifications?role=${encodeURIComponent(role)}${userId ? `&userId=${encodeURIComponent(userId)}` : ""}`),
+  markRead: (role, userId) => api.post("/notifications/read", { role, userId })
+};
+
 export default api;

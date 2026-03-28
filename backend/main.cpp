@@ -135,6 +135,27 @@ int main() {
         sendJson(res, 200, successResponse("Bank server is running.", {{"port", port}}));
     });
 
+    server.Get("/notifications", [&](const httplib::Request& req, httplib::Response& res) {
+        handleRequest(res, [&]() {
+            const auto role = req.get_param_value("role");
+            if (role.empty()) {
+                throw std::runtime_error("Role is required.");
+            }
+            const int userId = req.has_param("userId") ? std::stoi(req.get_param_value("userId")) : 0;
+            return bankService.getNotifications(role, userId);
+        }, "Notifications fetched successfully.");
+    });
+
+    server.Post("/notifications/read", [&](const httplib::Request& req, httplib::Response& res) {
+        handleRequest(res, [&]() {
+            const auto body = parseBody(req);
+            return bankService.markNotificationsRead(
+                body.at("role").get<std::string>(),
+                body.value("userId", 0)
+            );
+        }, "Notifications marked as read.");
+    });
+
     server.Post("/login", [&](const httplib::Request& req, httplib::Response& res) {
         handleRequest(res, [&]() {
             const auto body = parseBody(req);
@@ -243,6 +264,29 @@ int main() {
         }, "Employees fetched successfully.");
     });
 
+    server.Get("/manager/overview", [&](const httplib::Request&, httplib::Response& res) {
+        handleRequest(res, [&]() {
+            return bankService.getSystemOverview();
+        }, "Manager overview fetched successfully.");
+    });
+
+    server.Get("/manager/admins", [&](const httplib::Request&, httplib::Response& res) {
+        handleRequest(res, [&]() {
+            return bankService.getAdmins();
+        }, "Admins fetched successfully.");
+    });
+
+    server.Post("/manager/add-admin", [&](const httplib::Request& req, httplib::Response& res) {
+        handleRequest(res, [&]() {
+            const auto body = parseBody(req);
+            return bankService.addAdmin(
+                body.at("name").get<std::string>(),
+                body.at("password").get<std::string>(),
+                body.at("salary").get<double>()
+            );
+        }, "Admin added successfully.", 201);
+    });
+
     server.Put(R"(/admin/employee/(\d+))", [&](const httplib::Request& req, httplib::Response& res) {
         handleRequest(res, [&]() {
             const auto body = parseBody(req);
@@ -253,6 +297,18 @@ int main() {
                 body.at("salary").get<double>()
             );
         }, "Employee updated successfully.");
+    });
+
+    server.Put(R"(/manager/admin/(\d+))", [&](const httplib::Request& req, httplib::Response& res) {
+        handleRequest(res, [&]() {
+            const auto body = parseBody(req);
+            return bankService.updateAdmin(
+                std::stoi(req.matches[1].str()),
+                body.at("name").get<std::string>(),
+                body.at("password").get<std::string>(),
+                body.at("salary").get<double>()
+            );
+        }, "Admin updated successfully.");
     });
 
     std::cout << "Bank HTTP server running at http://localhost:" << port << "\n";

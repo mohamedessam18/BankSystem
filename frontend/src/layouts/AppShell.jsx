@@ -4,18 +4,23 @@ import Topbar from "../components/Topbar";
 import { useAuth } from "../context/AuthContext";
 
 const navByRole = {
+  manager: [
+    { label: "Overview", href: "/dashboard/manager", icon: "dashboard", end: true },
+    { label: "People Control", href: "/dashboard/manager/people-control", icon: "people" },
+    { label: "Executive Tools", href: "/dashboard/manager/executive-tools", icon: "security" }
+  ],
   client: [
-    { label: "Dashboard", href: "/dashboard/client", icon: "dashboard" },
-    { label: "Transactions", href: "/dashboard/client", icon: "transactions" }
+    { label: "Dashboard", href: "/dashboard/client", icon: "dashboard", end: true },
+    { label: "Transactions", href: "/dashboard/client/transactions", icon: "transactions" }
   ],
   employee: [
-    { label: "Dashboard", href: "/dashboard/employee", icon: "dashboard" },
-    { label: "Clients", href: "/dashboard/employee", icon: "people" }
+    { label: "Dashboard", href: "/dashboard/employee", icon: "dashboard", end: true },
+    { label: "Clients", href: "/dashboard/employee/clients", icon: "people" }
   ],
   admin: [
-    { label: "Dashboard", href: "/dashboard/admin", icon: "dashboard" },
-    { label: "Clients / Employees", href: "/dashboard/admin", icon: "people" },
-    { label: "Security", href: "/dashboard/admin", icon: "security" }
+    { label: "Dashboard", href: "/dashboard/admin", icon: "dashboard", end: true },
+    { label: "Clients / Employees", href: "/dashboard/admin/people", icon: "people" },
+    { label: "Security", href: "/dashboard/admin/security", icon: "security" }
   ]
 };
 

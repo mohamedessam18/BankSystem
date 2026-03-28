@@ -4,22 +4,6 @@ project(BankSystemWeb LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-include(FetchContent)
-
-FetchContent_Declare(
-  cpp_httplib
-  GIT_REPOSITORY https://github.com/yhirose/cpp-httplib.git
-  GIT_TAG v0.16.3
-)
-
-FetchContent_Declare(
-  nlohmann_json
-  GIT_REPOSITORY https://github.com/nlohmann/json.git
-  GIT_TAG v3.11.3
-)
-
-FetchContent_MakeAvailable(cpp_httplib nlohmann_json)
-
 add_executable(bank_server
   main.cpp
   services/BankService.cpp
@@ -35,8 +19,7 @@ add_executable(bank_server
 )
 
 target_include_directories(bank_server PRIVATE
-  ${cpp_httplib_SOURCE_DIR}
-  ${nlohmann_json_SOURCE_DIR}/include
+  ${CMAKE_CURRENT_SOURCE_DIR}/vendor
   ${CMAKE_CURRENT_SOURCE_DIR}/core
   ${CMAKE_CURRENT_SOURCE_DIR}/services
 )
