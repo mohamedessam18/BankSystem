@@ -120,6 +120,22 @@ If you want to try the web app directly, the frontend is already deployed here:
       Higher-level control over clients, employees, and administration tasks.
     </td>
   </tr>
+  <tr>
+    <td width="50%" valign="top" align="center">
+      <img src="./assets/manager%20view.png" alt="Manager dashboard" width="100%" />
+      <br />
+      <strong>Manager Workspace</strong>
+      <br />
+      Oversight dashboards, executive tools, and people control for the highest role.
+    </td>
+    <td width="50%" valign="top" align="center">
+      <img src="./assets/live%20notification%20for%20client.png" alt="Live notifications" width="100%" />
+      <br />
+      <strong>Live Notifications</strong>
+      <br />
+      Real-time notification views added across client, employee, admin, and manager roles.
+    </td>
+  </tr>
 </table>
 
 <details>
@@ -145,6 +161,22 @@ If you want to try the web app directly, the frontend is already deployed here:
     <img src="./assets/admin%20add%20employee%20feature.png" alt="Admin add employee feature" width="45%" />
     <img src="./assets/admin%20edit%20employee%20feature.png" alt="Admin edit employee feature" width="45%" />
   </p>
+  <p align="center">
+    <img src="./assets/manager%20dashboard1.png" alt="Manager dashboard overview" width="45%" />
+    <img src="./assets/manager%20dashboard2.png" alt="Manager dashboard details" width="45%" />
+  </p>
+  <p align="center">
+    <img src="./assets/manager%20features.png" alt="Manager features" width="45%" />
+    <img src="./assets/manager%20view.png" alt="Manager view" width="45%" />
+  </p>
+  <p align="center">
+    <img src="./assets/live%20notification%20for%20client.png" alt="Client live notifications" width="45%" />
+    <img src="./assets/live%20notification%20for%20Employee.png" alt="Employee live notifications" width="45%" />
+  </p>
+  <p align="center">
+    <img src="./assets/live%20notification%20for%20admin.png" alt="Admin live notifications" width="45%" />
+    <img src="./assets/live%20notifications%20for%20manager.png" alt="Manager live notifications" width="45%" />
+  </p>
 </details>
 
 ## Feature Map
@@ -154,10 +186,10 @@ If you want to try the web app directly, the frontend is already deployed here:
 | Area | Included |
 | --- | --- |
 | Auth | Login, signup, protected role access |
-| Client | Balance, deposit, withdraw, transfer, password update |
-| Employee | Add, search, list, and edit clients |
-| Admin | Client and employee management |
-| Manager | Oversight metrics, admin control, executive tools |
+| Client | Balance, deposit, withdraw, transfer, password update, live notifications |
+| Employee | Add, search, list, edit clients, live notifications |
+| Admin | Client and employee management, live notifications |
+| Manager | Oversight metrics, admin control, executive tools, live notifications |
 
 </div>
 
@@ -175,6 +207,7 @@ If you want to try the web app directly, the frontend is already deployed here:
 - Transfer funds to another client
 - Access a transaction-focused dashboard
 - Update account password
+- Receive live notifications inside the client experience
 
 ### Employee
 
@@ -183,6 +216,7 @@ If you want to try the web app directly, the frontend is already deployed here:
 - List all clients
 - Edit existing client information
 - Update employee password
+- Receive live notifications for employee actions
 
 ### Admin
 
@@ -193,6 +227,7 @@ If you want to try the web app directly, the frontend is already deployed here:
 - Search employees
 - Edit employees
 - Access administrative summary and control screens
+- Receive live notifications for admin-level activity
 
 ### Manager
 
@@ -200,6 +235,8 @@ If you want to try the web app directly, the frontend is already deployed here:
 - Manage admins
 - Access executive operations tools
 - Intervene in account actions through higher-level controls
+- View dedicated manager dashboards and feature panels
+- Receive live notifications in the manager workspace
 
 ## Why It Stands Out
 
