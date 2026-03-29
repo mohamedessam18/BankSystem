@@ -4,6 +4,7 @@
 #include "Repository.h"
 #include "Admin.h"
 #include "Validation.h"
+#include "ConsoleTheme.h"
 #include <iostream>
 #include <limits>
 
@@ -11,34 +12,34 @@ namespace {
     int readInt(const std::string& prompt) {
         int value;
         while (true) {
-            std::cout << prompt;
+            ConsoleTheme::prompt(prompt);
             if (std::cin >> value) {
                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
                 return value;
             }
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            std::cout << "Invalid number. Try again.\n";
+            ConsoleTheme::error("Invalid number. Try again.\n");
         }
     }
 
     double readDouble(const std::string& prompt) {
         double value;
         while (true) {
-            std::cout << prompt;
+            ConsoleTheme::prompt(prompt);
             if (std::cin >> value) {
                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
                 return value;
             }
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            std::cout << "Invalid amount. Try again.\n";
+            ConsoleTheme::error("Invalid amount. Try again.\n");
         }
     }
 
     std::string readLine(const std::string& prompt) {
         std::string value;
-        std::cout << prompt;
+        ConsoleTheme::prompt(prompt);
         std::getline(std::cin, value);
         return value;
     }
@@ -53,14 +54,14 @@ namespace {
 }
 
 void ClientManager::printClientMenu() {
-    std::cout << "\n========== Client Menu ==========\n";
-    std::cout << "1. Deposit\n";
-    std::cout << "2. Withdraw\n";
-    std::cout << "3. Transfer\n";
-    std::cout << "4. Check Balance\n";
-    std::cout << "5. Update Password\n";
-    std::cout << "6. Logout\n";
-    std::cout << "=================================\n";
+    ConsoleTheme::divider("========== Client Menu ==========");
+    ConsoleTheme::menuItem(1, "Deposit");
+    ConsoleTheme::menuItem(2, "Withdraw");
+    ConsoleTheme::menuItem(3, "Transfer");
+    ConsoleTheme::menuItem(4, "Check Balance");
+    ConsoleTheme::menuItem(5, "Update Password");
+    ConsoleTheme::menuItem(6, "Logout");
+    ConsoleTheme::mutedLine("=================================\n");
 }
 
 void ClientManager::updatePassword(Person* person) {
@@ -132,7 +133,7 @@ Client* ClientManager::createAccount() {
         if (Validation::isValidName(name)) {
             break;
         }
-        std::cout << "Invalid name. Name must be 3-20 alphabetic characters.\n";
+        ConsoleTheme::error("Invalid name. Name must be 3-20 alphabetic characters.\n");
     }
 
     std::string password;
@@ -141,7 +142,7 @@ Client* ClientManager::createAccount() {
         if (Validation::isValidPassword(password)) {
             break;
         }
-        std::cout << "Invalid password. Password must be 8-20 chars and no spaces.\n";
+        ConsoleTheme::error("Invalid password. Password must be 8-20 chars and no spaces.\n");
     }
 
     double balance;
@@ -150,7 +151,7 @@ Client* ClientManager::createAccount() {
         if (balance >= 1500) {
             break;
         }
-        std::cout << "Initial balance must be at least 1500.\n";
+        ConsoleTheme::error("Initial balance must be at least 1500.\n");
     }
 
     int id = FilesHelper::getLast("LastClientId.txt") + 1;
@@ -160,7 +161,8 @@ Client* ClientManager::createAccount() {
     fm.addClient(newClient);
     Repository::addClient(newClient);
 
-    std::cout << "Account created successfully. Your ID is: " << id << "\n";
+    ConsoleTheme::success("Account created successfully. ");
+    std::cout << "Your ID is: " << id << "\n";
 
     for (auto& client : Repository::clients) {
         if (client.getId() == id) {
@@ -194,7 +196,7 @@ bool ClientManager::clientOptions(Client* client) {
     case 3: {
         int targetId = readInt("Enter recipient client ID: ");
         if (targetId == client->getId()) {
-            std::cout << "Cannot transfer to the same account.\n";
+            ConsoleTheme::error("Cannot transfer to the same account.\n");
             return true;
         }
         Client* recipient = nullptr;
@@ -205,7 +207,7 @@ bool ClientManager::clientOptions(Client* client) {
             }
         }
         if (recipient == nullptr) {
-            std::cout << "Client not found.\n";
+            ConsoleTheme::error("Client not found.\n");
             return true;
         }
         double amount = readDouble("Enter amount to transfer: ");
@@ -218,12 +220,12 @@ bool ClientManager::clientOptions(Client* client) {
         return true;
     case 5:
         updatePassword(client);
-        std::cout << "Password updated.\n";
+        ConsoleTheme::success("Password updated.\n");
         return true;
     case 6:
         return false;
     default:
-        std::cout << "Invalid choice.\n";
+        ConsoleTheme::error("Invalid choice.\n");
         return true;
     }
 }

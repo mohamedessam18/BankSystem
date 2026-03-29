@@ -5,6 +5,7 @@
 #include "Repository.h"
 #include "FileManager.h"
 #include "Validation.h"
+#include "ConsoleTheme.h"
 #include <iostream>
 #include <limits>
 
@@ -12,52 +13,52 @@ namespace {
     int readInt(const std::string& prompt) {
         int value;
         while (true) {
-            std::cout << prompt;
+            ConsoleTheme::prompt(prompt);
             if (std::cin >> value) {
                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
                 return value;
             }
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            std::cout << "Invalid number. Try again.\n";
+            ConsoleTheme::error("Invalid number. Try again.\n");
         }
     }
 
     double readDouble(const std::string& prompt) {
         double value;
         while (true) {
-            std::cout << prompt;
+            ConsoleTheme::prompt(prompt);
             if (std::cin >> value) {
                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
                 return value;
             }
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            std::cout << "Invalid number. Try again.\n";
+            ConsoleTheme::error("Invalid number. Try again.\n");
         }
     }
 
     std::string readLine(const std::string& prompt) {
         std::string value;
-        std::cout << prompt;
+        ConsoleTheme::prompt(prompt);
         std::getline(std::cin, value);
         return value;
     }
 }
 
 void AdminManager::printAdminMenu() {
-    std::cout << "\n=========== Admin Menu ==========\n";
-    std::cout << "1. Add New Client\n";
-    std::cout << "2. List All Clients\n";
-    std::cout << "3. Search For Client\n";
-    std::cout << "4. Edit Client Info\n";
-    std::cout << "5. Add New Employee\n";
-    std::cout << "6. List Employees\n";
-    std::cout << "7. Search Employee\n";
-    std::cout << "8. Edit Employee\n";
-    std::cout << "9. Update Password\n";
-    std::cout << "10. Logout\n";
-    std::cout << "=================================\n";
+    ConsoleTheme::divider("=========== Admin Menu ==========");
+    ConsoleTheme::menuItem(1, "Add New Client");
+    ConsoleTheme::menuItem(2, "List All Clients");
+    ConsoleTheme::menuItem(3, "Search For Client");
+    ConsoleTheme::menuItem(4, "Edit Client Info");
+    ConsoleTheme::menuItem(5, "Add New Employee");
+    ConsoleTheme::menuItem(6, "List Employees");
+    ConsoleTheme::menuItem(7, "Search Employee");
+    ConsoleTheme::menuItem(8, "Edit Employee");
+    ConsoleTheme::menuItem(9, "Update Password");
+    ConsoleTheme::menuItem(10, "Logout");
+    ConsoleTheme::mutedLine("=================================\n");
 }
 
 Admin* AdminManager::createAccount() {
@@ -67,7 +68,7 @@ Admin* AdminManager::createAccount() {
         if (Validation::isValidName(name)) {
             break;
         }
-        std::cout << "Invalid name. Name must be 3-20 alphabetic characters.\n";
+        ConsoleTheme::error("Invalid name. Name must be 3-20 alphabetic characters.\n");
     }
 
     std::string password;
@@ -76,7 +77,7 @@ Admin* AdminManager::createAccount() {
         if (Validation::isValidPassword(password)) {
             break;
         }
-        std::cout << "Invalid password. Password must be 8-20 chars and no spaces.\n";
+        ConsoleTheme::error("Invalid password. Password must be 8-20 chars and no spaces.\n");
     }
 
     double salary;
@@ -85,7 +86,7 @@ Admin* AdminManager::createAccount() {
         if (salary >= 5000) {
             break;
         }
-        std::cout << "Salary must be at least 5000.\n";
+        ConsoleTheme::error("Salary must be at least 5000.\n");
     }
 
     int id = FilesHelper::getLast("LastAdminId.txt") + 1;
@@ -95,7 +96,8 @@ Admin* AdminManager::createAccount() {
     fm.addAdmin(admin);
     Repository::addAdmin(admin);
 
-    std::cout << "Admin account created successfully. ID: " << id << "\n";
+    ConsoleTheme::success("Admin account created successfully. ");
+    std::cout << "ID: " << id << "\n";
 
     for (auto& a : Repository::admins) {
         if (a.getId() == id) {
@@ -142,7 +144,7 @@ bool AdminManager::adminOptions(Admin* admin) {
         if (client != nullptr) {
             client->display();
         } else {
-            std::cout << "Client not found.\n";
+            ConsoleTheme::error("Client not found.\n");
         }
         return true;
     }
@@ -172,7 +174,7 @@ bool AdminManager::adminOptions(Admin* admin) {
         if (employee != nullptr) {
             employee->display();
         } else {
-            std::cout << "Employee not found.\n";
+            ConsoleTheme::error("Employee not found.\n");
         }
         return true;
     }
@@ -186,12 +188,12 @@ bool AdminManager::adminOptions(Admin* admin) {
     }
     case 9:
         ClientManager::updatePassword(admin);
-        std::cout << "Password updated.\n";
+        ConsoleTheme::success("Password updated.\n");
         return true;
     case 10:
         return false;
     default:
-        std::cout << "Invalid choice.\n";
+        ConsoleTheme::error("Invalid choice.\n");
         return true;
     }
 }

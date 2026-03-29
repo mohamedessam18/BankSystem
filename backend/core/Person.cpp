@@ -1,4 +1,5 @@
 #include "Person.h"
+#include "ConsoleTheme.h"
 
 Person::Person() : id(0), name(""), password("") {}
 
@@ -28,7 +29,7 @@ void Person::setName(const std::string& name) {
     if (Validation::isValidName(name)) {
         this->name = name;
     } else {
-        std::cout << "Error: Name must be 3-20 alphabetic characters only.\n";
+        ConsoleTheme::error("Error: Name must be 3-20 alphabetic characters only.\n");
     }
 }
 
@@ -36,6 +37,6 @@ void Person::setPassword(const std::string& password) {
     if (Validation::isValidPassword(password)) {
         this->password = password;
     } else {
-        std::cout << "Error: Password must be 8-20 characters with no spaces.\n";
-    }
+        ConsoleTheme::error("Error: Password must be 8-20 characters with no spaces.\n");
+}
 }

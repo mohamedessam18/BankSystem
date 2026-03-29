@@ -1,4 +1,5 @@
 #include "FilesHelper.h"
+#include "ConsoleTheme.h"
 
 namespace {
     std::filesystem::path g_dataDirectory = std::filesystem::current_path();
@@ -22,7 +23,7 @@ void FilesHelper::saveLast(const std::string& fileName, int id) {
         file << id;
         file.close();
     } else {
-        std::cout << "Error: Could not save last ID to " << fileName << "\n";
+        ConsoleTheme::error("Error: Could not save last ID to " + fileName + "\n");
     }
 }
 
@@ -52,7 +53,7 @@ void FilesHelper::saveClient(const Client& c) {
         file.close();
         saveLast("LastClientId.txt", c.getId());
     } else {
-        std::cout << "Error: Could not open Clients.txt for writing.\n";
+        ConsoleTheme::error("Error: Could not open Clients.txt for writing.\n");
     }
 }
 
@@ -64,7 +65,7 @@ void FilesHelper::saveEmployee(const Employee& e) {
         file.close();
         saveLast("LastEmployeeId.txt", e.getId());
     } else {
-        std::cout << "Error: Could not open Employees.txt for writing.\n";
+        ConsoleTheme::error("Error: Could not open Employees.txt for writing.\n");
     }
 }
 
@@ -76,8 +77,8 @@ void FilesHelper::saveAdmin(const Admin& a) {
         file.close();
         saveLast("LastAdminId.txt", a.getId());
     } else {
-        std::cout << "Error: Could not open Admins.txt for writing.\n";
-    }
+        ConsoleTheme::error("Error: Could not open Admins.txt for writing.\n");
+}
 }
 
 void FilesHelper::getClients() {

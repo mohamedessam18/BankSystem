@@ -1,4 +1,5 @@
 #include "Employee.h"
+#include "ConsoleTheme.h"
 #include "FileManager.h"
 #include "Repository.h"
 #include <iostream>
@@ -18,7 +19,7 @@ void Employee::setSalary(double salary) {
     if (salary >= 5000) {
         this->salary = salary;
     } else {
-        std::cout << "Error: Minimum salary must be 5000.\n";
+        ConsoleTheme::error("Error: Minimum salary must be 5000.\n");
         this->salary = 5000;
     }
 }
@@ -27,7 +28,7 @@ void Employee::addClient(Client& client) {
     FileManager fm;
     fm.addClient(client);
     Repository::addClient(client);
-    std::cout << "Client added successfully by Employee.\n";
+    ConsoleTheme::success("Client added successfully by Employee.\n");
 }
 
 Client* Employee::searchClient(int id) {
@@ -70,17 +71,17 @@ void Employee::editClient(int id, const std::string& name, const std::string& pa
         for (auto& c : Repository::clients) {
             fm.addClient(c);
         }
-        std::cout << "Client updated successfully by Employee.\n";
+        ConsoleTheme::success("Client updated successfully by Employee.\n");
     } else {
-        std::cout << "Error: Client not found.\n";
+        ConsoleTheme::error("Error: Client not found.\n");
     }
 }
 
 void Employee::display() const {
-    std::cout << "========= Employee Info =========\n";
-    std::cout << "ID:       " << id << "\n";
-    std::cout << "Name:     " << name << "\n";
-    std::cout << "Password: ********\n";
-    std::cout << "Salary:   " << salary << "\n";
-    std::cout << "=================================\n";
+    ConsoleTheme::divider("========= Employee Info =========");
+    ConsoleTheme::field("ID: ", std::to_string(id));
+    ConsoleTheme::field("Name: ", name);
+    ConsoleTheme::field("Password: ", "********");
+    ConsoleTheme::field("Salary: ", std::to_string(salary));
+    ConsoleTheme::mutedLine("=================================\n");
 }
