@@ -1,4 +1,5 @@
 #include "Admin.h"
+#include "ConsoleTheme.h"
 #include "FileManager.h"
 #include "Repository.h"
 #include <iostream>
@@ -12,7 +13,7 @@ void Admin::addClient(Client& client) {
     FileManager fm;
     fm.addClient(client);
     Repository::addClient(client);
-    cout << "Client added successfully by Admin.\n";
+    ConsoleTheme::success("Client added successfully by Admin.\n");
 }
 
 Client* Admin::searchClient(int id) {
@@ -55,9 +56,9 @@ void Admin::editClient(int id, const std::string& name, const std::string& passw
         for (auto& c : Repository::clients) {
             fm.addClient(c);
         }
-        cout << "Client updated successfully by Admin.\n";
+        ConsoleTheme::success("Client updated successfully by Admin.\n");
     } else {
-        cout << "Error: Client not found.\n";
+        ConsoleTheme::error("Error: Client not found.\n");
     }
 }
 
@@ -65,7 +66,7 @@ void Admin::addEmployee(Employee& employee) {
     FileManager fm;
     fm.addEmployee(employee);
     Repository::addEmployee(employee);
-    cout << "Employee added successfully by Admin.\n";
+    ConsoleTheme::success("Employee added successfully by Admin.\n");
 }
 
 Employee* Admin::searchEmployee(int id) {
@@ -103,9 +104,9 @@ void Admin::editEmployee(int id, const string& name, const string& password, dou
         for (auto& e : Repository::employees) {
             fm.addEmployee(e);
         }
-        cout << "Employee updated successfully by Admin.\n";
+        ConsoleTheme::success("Employee updated successfully by Admin.\n");
     } else {
-        cout << "Error: Employee not found.\n";
+        ConsoleTheme::error("Error: Employee not found.\n");
     }
 }
 
@@ -115,10 +116,10 @@ void Admin::listEmployee() {
 }
 
 void Admin::display() const {
-    cout << "========== Admin Info ==========\n";
-    cout << "ID:       " << id << "\n";
-    cout << "Name:     " << name << "\n";
-    cout << "Password: ********\n";
-    cout << "Salary:   " << salary << "\n";
-    cout << "=================================\n";
+    ConsoleTheme::divider("========== Admin Info ==========");
+    ConsoleTheme::field("ID: ", std::to_string(id));
+    ConsoleTheme::field("Name: ", name);
+    ConsoleTheme::field("Password: ", "********");
+    ConsoleTheme::field("Salary: ", std::to_string(salary));
+    ConsoleTheme::mutedLine("=================================\n");
 }

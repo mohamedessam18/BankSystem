@@ -1,4 +1,5 @@
 #include "FileManager.h"
+#include "ConsoleTheme.h"
 #include <iostream>
 
 void FileManager::addClient(Client obj) {
@@ -16,43 +17,43 @@ void FileManager::addAdmin(Admin obj) {
 void FileManager::getAllClients() {
     FilesHelper::getClients();
     
-    std::cout << "\n========== All Clients ==========\n";
+    ConsoleTheme::divider("========== All Clients ==========");
     if (Repository::clients.empty()) {
-        std::cout << "No clients found.\n";
+        ConsoleTheme::error("No clients found.\n");
     } else {
         for (auto& client : Repository::clients) {
             client.display();
         }
     }
-    std::cout << "==================================\n";
+    ConsoleTheme::mutedLine("==================================\n");
 }
 
 void FileManager::getAllEmployees() {
     FilesHelper::getEmployees();
     
-    std::cout << "\n========= All Employees =========\n";
+    ConsoleTheme::divider("========= All Employees =========");
     if (Repository::employees.empty()) {
-        std::cout << "No employees found.\n";
+        ConsoleTheme::error("No employees found.\n");
     } else {
         for (auto& employee : Repository::employees) {
             employee.display();
         }
     }
-    std::cout << "==================================\n";
+    ConsoleTheme::mutedLine("==================================\n");
 }
 
 void FileManager::getAllAdmins() {
     FilesHelper::getAdmins();
     
-    std::cout << "\n========== All Admins ==========\n";
+    ConsoleTheme::divider("========== All Admins ==========");
     if (Repository::admins.empty()) {
-        std::cout << "No admins found.\n";
+        ConsoleTheme::error("No admins found.\n");
     } else {
         for (auto& admin : Repository::admins) {
             admin.display();
         }
     }
-    std::cout << "==================================\n";
+    ConsoleTheme::mutedLine("==================================\n");
 }
 
 void FileManager::removeAllClients() {

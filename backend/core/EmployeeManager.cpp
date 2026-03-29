@@ -4,6 +4,7 @@
 #include "Repository.h"
 #include "FileManager.h"
 #include "Validation.h"
+#include "ConsoleTheme.h"
 #include <iostream>
 #include <limits>
 
@@ -11,48 +12,48 @@ namespace {
     int readInt(const std::string& prompt) {
         int value;
         while (true) {
-            std::cout << prompt;
+            ConsoleTheme::prompt(prompt);
             if (std::cin >> value) {
                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
                 return value;
             }
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            std::cout << "Invalid number. Try again.\n";
+            ConsoleTheme::error("Invalid number. Try again.\n");
         }
     }
 
     double readDouble(const std::string& prompt) {
         double value;
         while (true) {
-            std::cout << prompt;
+            ConsoleTheme::prompt(prompt);
             if (std::cin >> value) {
                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
                 return value;
             }
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            std::cout << "Invalid number. Try again.\n";
+            ConsoleTheme::error("Invalid number. Try again.\n");
         }
     }
 
     std::string readLine(const std::string& prompt) {
         std::string value;
-        std::cout << prompt;
+        ConsoleTheme::prompt(prompt);
         std::getline(std::cin, value);
         return value;
     }
 }
 
 void EmployeeManager::printEmployeeMenu() {
-    std::cout << "\n========= Employee Menu =========\n";
-    std::cout << "1. Add New Client\n";
-    std::cout << "2. List All Clients\n";
-    std::cout << "3. Search For Client\n";
-    std::cout << "4. Edit Client Info\n";
-    std::cout << "5. Update Password\n";
-    std::cout << "6. Logout\n";
-    std::cout << "=================================\n";
+    ConsoleTheme::divider("========= Employee Menu =========");
+    ConsoleTheme::menuItem(1, "Add New Client");
+    ConsoleTheme::menuItem(2, "List All Clients");
+    ConsoleTheme::menuItem(3, "Search For Client");
+    ConsoleTheme::menuItem(4, "Edit Client Info");
+    ConsoleTheme::menuItem(5, "Update Password");
+    ConsoleTheme::menuItem(6, "Logout");
+    ConsoleTheme::mutedLine("=================================\n");
 }
 
 Employee* EmployeeManager::createAccount() {
@@ -62,7 +63,7 @@ Employee* EmployeeManager::createAccount() {
         if (Validation::isValidName(name)) {
             break;
         }
-        std::cout << "Invalid name. Name must be 3-20 alphabetic characters.\n";
+        ConsoleTheme::error("Invalid name. Name must be 3-20 alphabetic characters.\n");
     }
 
     std::string password;
@@ -71,7 +72,7 @@ Employee* EmployeeManager::createAccount() {
         if (Validation::isValidPassword(password)) {
             break;
         }
-        std::cout << "Invalid password. Password must be 8-20 chars and no spaces.\n";
+        ConsoleTheme::error("Invalid password. Password must be 8-20 chars and no spaces.\n");
     }
 
     double salary;
@@ -80,7 +81,7 @@ Employee* EmployeeManager::createAccount() {
         if (salary >= 5000) {
             break;
         }
-        std::cout << "Salary must be at least 5000.\n";
+        ConsoleTheme::error("Salary must be at least 5000.\n");
     }
 
     int id = FilesHelper::getLast("LastEmployeeId.txt") + 1;
@@ -90,7 +91,8 @@ Employee* EmployeeManager::createAccount() {
     fm.addEmployee(employee);
     Repository::addEmployee(employee);
 
-    std::cout << "Employee account created successfully. ID: " << id << "\n";
+    ConsoleTheme::success("Employee account created successfully. ");
+    std::cout << "ID: " << id << "\n";
 
     for (auto& e : Repository::employees) {
         if (e.getId() == id) {
@@ -131,7 +133,7 @@ void EmployeeManager::searchForClient(Employee* employee) {
     if (client != nullptr) {
         client->display();
     } else {
-        std::cout << "Client not found.\n";
+        ConsoleTheme::error("Client not found.\n");
     }
 }
 
@@ -180,12 +182,12 @@ bool EmployeeManager::employeeOptions(Employee* employee) {
         return true;
     case 5:
         ClientManager::updatePassword(employee);
-        std::cout << "Password updated.\n";
+        ConsoleTheme::success("Password updated.\n");
         return true;
     case 6:
         return false;
     default:
-        std::cout << "Invalid choice.\n";
+        ConsoleTheme::error("Invalid choice.\n");
         return true;
     }
 }
